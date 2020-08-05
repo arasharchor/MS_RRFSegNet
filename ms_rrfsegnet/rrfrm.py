@@ -60,17 +60,16 @@ def get_triads(supervoxel_features, nn_idx, k):
     num_vertex_pairs = k
     vertex_pairs_list = [(i, i+1) for i in range(k-1)]
     vertex_pairs_list.append((k-1, 0))
+    vertex_pairs = []
     for i in range(num_vertex_pairs):
       temp_vertex_pairs = tf.concat([supervoxel_neighbors[:, :, vertex_pairs_list[i][0], :],
                                      supervoxel_neighbors[:, :, vertex_pairs_list[i][1], :]],
                                     axis=-1)
       temp_vertex_pairs = tf.expand_dims(temp_vertex_pairs, -2)
       #####
-      if i == 0:
-          vertex_pairs = temp_vertex_pairs
-      else:
-          vertex_pairs = tf.concat([vertex_pairs, temp_vertex_pairs], axis=-2)
-
+      vertex_pairs.append(temp_vertex_pairs)
+    #####    
+    vertex_pairs = np.vstack(vertex_pairs)
     central_vertex = tf.expand_dims(supervoxel_features, axis=-2)
     central_vertex = tf.tile(central_vertex, [1, 1, num_vertex_pairs, 1])
     #######
